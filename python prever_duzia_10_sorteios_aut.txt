@@ -1,0 +1,9 @@
+python prever_duzia_10_sorteios_automatico.pyuma dica para inserir no código quando são sorteado
+
+
+Salvar o arquivo com o nome:
+
+prever_duzia_10_sorteios_automatico_v2.py
+Rodar no Prompt com o comando:
+
+python prever_duzia_10_sorteios_automatico_v2.py

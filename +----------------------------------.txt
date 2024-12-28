@@ -1,0 +1,93 @@
+//+------------------------------------------------------------------+
+//|                                                     RSI_Fractal  |
+//|   Exemplo com RSI, Canal de Donchian e Fractals no MQL5          |
+//+------------------------------------------------------------------+
+#include <Trade\Trade.mqh>  // Biblioteca para gerenciar ordens
+
+// Declarar variáveis globais
+int handleFractals;            // Handle para o indicador Fractals
+double fractalHigh[], fractalLow[];  // Arrays para armazenar fractais
+double donchianHigh, donchianLow;    // Valores do Canal de Donchian
+int rsiHandle;                 // Handle para o indicador RSI
+double rsiValue[];             // Array para armazenar valores do RSI
+MqlRates rates[];              // Array para armazenar dados de candles
+CTrade trade;                  // Objeto para envio de ordens
+
+// Parâmetros do robô
+double stopLoss = 50;          // Stop Loss em pontos
+double takeProfit = 100;       // Take Profit em pontos
+double lotSize = 0.1;          // Tamanho do lote
+
+//+------------------------------------------------------------------+
+//| Função de inicialização do robô                                  |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   // Inicializa indicadores
+   handleFractals = iFractals(_Symbol, PERIOD_CURRENT);   // Fractals
+   rsiHandle      = iRSI(_Symbol, PERIOD_CURRENT, 14, PRICE_CLOSE); // RSI de período 14
+
+   if (handleFractals == INVALID_HANDLE || rsiHandle == INVALID_HANDLE)
+   {
+      Print("Erro ao criar handle dos indicadores!");
+      return(INIT_FAILED);
+   }
+
+   Print("Inicialização concluída com sucesso!");
+   return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Função principal - é chamada a cada novo tick                    |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+   // Atualiza buffers do Fractals
+   if (CopyBuffer(handleFractals, 0, 0, 3, fractalHigh) <= 0 ||
+       CopyBuffer(handleFractals, 1, 0, 3, fractalLow) <= 0)
+   {
+      Print("Erro ao atualizar buffers de fractais!");
+      return;
+   }
+
+   // Atualiza valores do RSI
+   if (CopyBuffer(rsiHandle, 0, 0, 1, rsiValue) <= 0)
+   {
+      Print("Erro ao atualizar buffer do RSI!");
+      return;
+   }
+
+   // Copia os dados das candles mais recentes
+   if (CopyRates(_Symbol, PERIOD_CURRENT, 0, 2, rates) <= 0)
+   {
+      Print("Erro ao obter dados do gráfico!");
+      return;
+   }
+
+   double closePrice1 = rates[1].close;  // Preço de fechamento do candle anterior
+
+   // Calcula o Canal de Donchian (máxima/mínima dos últimos 20 candles)
+   donchianHigh = iHigh(_Symbol, PERIOD_CURRENT, iHighest(_Symbol, PERIOD_CURRENT, MODE_HIGH, 20, 0));
+   donchianLow  = iLow(_Symbol, PERIOD_CURRENT, iLowest(_Symbol, PERIOD_CURRENT, MODE_LOW, 20, 0));
+
+   // Verifica se já existe uma posição aberta
+   if (PositionsTotal() > 0) return;
+
+   // Condição de Compra: RSI abaixo de 30 e preço acima do fractal baixo
+   if (rsiValue[0] < 30 && closePrice1 > fractalLow[1])
+   {
+      Print("Condição de compra encontrada. RSI: ", rsiValue[0]);
+      double slBuy = closePrice1 - stopLoss * _Point;
+      double tpBuy = closePrice1 + takeProfit * _Point;
+      trade.Buy(lotSize, _Symbol, closePrice1, slBuy, tpBuy, "Compra RSI_Fractal");
+   }
+
+   // Condição de Venda: RSI acima de 70 e preço abaixo do fractal alto
+   if (rsiValue[0] > 70 && closePrice1 < fractalHigh[1])
+   {
+      Print("Condição de venda encontrada. RSI: ", rsiValue[0]);
+      double slSell = closePrice1 + stopLoss * _Point;
+      double tpSell = closePrice1 - takeProfit * _Point;
+      trade.Sell(lotSize, _Symbol, closePrice1, slSell, tpSell, "Venda RSI_Fractal");
+   }
+}

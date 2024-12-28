@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Previsão de Roleta</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Imagem inicial -->
+        <img src="foto_inicial.jpg" alt="Foto Inicial">
+        <h1>Bem-vindo à Previsão de Roleta</h1>
+        <p>Insira os últimos números sorteados para obter as melhores previsões de colunas e dúzias.</p>
+        
+        <div id="output"></div>
+        
+        <label for="numero">Digite o próximo número sorteado (1-36):</label>
+        <input type="number" id="numero" min="1" max="36">
+        <button onclick="adicionarNumero()">Adicionar Número</button>
+    </div>
+    
+    <script>
+        let numerosSorteados = [];
+
+        function obterColuna(numero) {
+            if ([1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34].includes(numero)) return 1;
+            if ([2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35].includes(numero)) return 2;
+            if ([3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36].includes(numero)) return 3;
+            return null;
+        }
+
+        function obterDuzia(numero) {
+            if (numero >= 1 && numero <= 12) return 1;
+            if (numero >= 13 && numero <= 24) return 2;
+            if (numero >= 25 && numero <= 36) return 3;
+            return null;
+        }
+
+        function sugerirApostas(numeros) {
+            if (numeros.length < 2) {
+                return "Insira pelo menos dois números para gerar uma sugestão.";
+            }
+
+            const ultimosNumeros = numeros.slice(-2);
+            const coluna1 = obterColuna(ultimosNumeros[0]);
+            const coluna2 = obterColuna(ultimosNumeros[1]);
+            const duzia1 = obterDuzia(ultimosNumeros[0]);
+            const duzia2 = obterDuzia(ultimosNumeros[1]);
+
+            let sugestao = "Sugestões de apostas:<br>";
+
+            if (coluna1 === coluna2) {
+                sugestao += `Os últimos dois números estão na mesma coluna (${coluna1}). Aposte em outras colunas.<br>`;
+            } else {
+                sugestao += "Os últimos dois números não estão na mesma coluna.<br>";
+            }
+
+            if (duzia1 === duzia2) {
+                sugestao += `Os últimos dois números estão na mesma dúzia (${duzia1}). Aposte em outras dúzias.<br>`;
+            } else {
+                sugestao += "Os últimos dois números não estão na mesma dúzia.<br>";
+            }
+
+            return sugestao;
+        }
+
+        function adicionarNumero() {
+            const numero = parseInt(document.getElementById("numero").value);
+            if (isNaN(numero) || numero < 1 || numero > 36) {
+                alert("Por favor, insira um número entre 1 e 36.");
+                return;
+            }
+
+            numerosSorteados.push(numero);
+            if (numerosSorteados.length > 10) {
+                numerosSorteados.shift();
+            }
+
+            const sugestoes = sugerirApostas(numerosSorteados);
+            document.getElementById("output").innerHTML = `
+                <p>Últimos números sorteados: ${numerosSorteados.join(", ")}</p>
+                <p>${sugestoes}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
