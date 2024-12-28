@@ -9,13 +9,13 @@
 <body>
     <header>
         <h1>Roleta Master</h1>
-        <p>Bem-vindo ao Roleta Master! Utilize nossa ferramenta para prever os resultados da roleta.</p>
+        <p>Bem-vindo ao Mestre Roleta! Utilize nossa ferramenta para prever os resultados da roleta.</p>
     </header>
 
     <section id="funciona">
         <h2>Como Funciona</h2>
-        <p>Com base nos resultados passados, nossa ferramenta prevê os próximos resultados.</p>
-        <button onclick="startPrediction()">Começar Previsão</button>
+        <p>Com base nos resultados passados, nossa ferramenta prevê os resultados mais prováveis da roleta.</p>
+        <button onclick="startPrediction()">Iniciar Previsão</button>
     </section>
 
     <section id="sobre">
@@ -23,8 +23,19 @@
         <p>Roleta Master usa algoritmos avançados para prever os resultados da roleta com base em dados reais.</p>
     </section>
 
+    <section id="contato">
+        <h2>Entre em Contato</h2>
+        <p>Se tiver dúvidas ou sugestões, entre em contato conosco!</p>
+        <form id="contact-form">
+            <input type="text" id="name" placeholder="Seu nome" required>
+            <input type="email" id="email" placeholder="Seu e-mail" required>
+            <textarea id="message" placeholder="Sua mensagem" required></textarea>
+            <button type="submit">Enviar Mensagem</button>
+        </form>
+    </section>
+
     <footer>
-        <p>&copy; 2024 Roleta Master</p>
+        <p>&copy; 2024 Roleta Master. Todos os direitos reservados.</p>
     </footer>
 
     <script src="script.js"></script>
